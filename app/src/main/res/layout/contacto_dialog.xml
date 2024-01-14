@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardBackgroundColor="#BEE3DF"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="10dp"
+    android:layout_gravity="center">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_margin="10dp">
+
+        <TextView
+            android:id="@+id/titulo_dialogo_contacto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nuevo contacto"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/blue"
+            android:layout_marginStart="10dp"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:boxStrokeColor="@color/blue"
+            app:hintTextColor="@color/blue"
+            android:layout_marginTop="10dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/nombre_dialogo"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Nombre"
+                android:inputType="text"
+                android:textColor="@color/blue"
+                android:textColorHint="@color/blue"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:boxStrokeColor="@color/blue"
+            app:hintTextColor="@color/blue"
+            android:layout_marginTop="5dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/numero_dialogo"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Numero"
+                android:inputType="number"
+                android:textColor="@color/blue"
+                android:textColorHint="@color/blue"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:boxStrokeColor="@color/blue"
+            app:hintTextColor="@color/blue"
+            android:layout_marginTop="5dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/correo_dialogo"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Correo"
+                android:inputType="textEmailAddress"
+                android:textColor="@color/blue"
+                android:textColorHint="@color/blue"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <ImageView
+            android:id="@+id/imagen_dialogo"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:src="@drawable/galeria"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="center"/>
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_dialogo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Contacto favorito"
+            android:textSize="16sp"
+            app:trackTint="@color/blue"
+            app:thumbTint="#1A4944"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/botonCancelar_dialogo_contacto"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="Cancelar"
+                android:backgroundTint="@color/blue"
+                app:cornerRadius="5dp"
+                android:textColor="@color/white"
+                android:layout_marginEnd="10dp"/>
+
+            <Button
+                android:id="@+id/botonConfirmar_dialogo_contacto"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="Confirmar"
+                android:backgroundTint="@color/blue"
+                app:cornerRadius="5dp"
+                android:textColor="@color/white"
+                android:layout_marginStart="10dp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
