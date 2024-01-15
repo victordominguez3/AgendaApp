@@ -1,9 +1,6 @@
 package vic.dom.agendaapp.fragment
 
-import android.app.Activity
 import android.app.AlertDialog
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -11,9 +8,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.contract.ActivityResultContracts
+import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
-import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import vic.dom.agendaapp.R
@@ -22,12 +18,11 @@ import vic.dom.agendaapp.adapters.ItemListContactoAdapter
 import vic.dom.agendaapp.adapters.OnContactoClickListener
 import vic.dom.agendaapp.database.AgendaApplication.Companion.database
 import vic.dom.agendaapp.databinding.FragmentContactosBinding
-import vic.dom.agendaapp.dialogs.ContactoDialog
 import vic.dom.agendaapp.models.Contacto
 import java.util.concurrent.LinkedBlockingQueue
 
 
-class ContactosFragment : Fragment(), OnContactoClickListener {
+class ContactosFragment : Fragment(), OnContactoClickListener, ContactoDialogFragment.DialogListener {
 
     private lateinit var binding: FragmentContactosBinding
 
@@ -66,10 +61,13 @@ class ContactosFragment : Fragment(), OnContactoClickListener {
                     queue.add(list)
                 }.start()
 
-                mListAdapter.setContactos(queue.take()
-                    .filter { it.nombre.lowercase().contains(s.toString().lowercase()) }.toMutableList())
-                mGridAdapter.setContactos(queue.take()
-                    .filter { it.nombre.lowercase().contains(s.toString().lowercase()) }.toMutableList())
+                if (vistaActual == "Lista") {
+                    mListAdapter.setContactos(queue.take()
+                        .filter { it.nombre.lowercase().contains(s.toString().lowercase()) }.sortedBy { it.nombre.lowercase() }.toMutableList())
+                } else {
+                    mGridAdapter.setContactos(queue.take()
+                        .filter { it.nombre.lowercase().contains(s.toString().lowercase()) }.sortedBy { it.nombre.lowercase() }.toMutableList())
+                }
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -85,7 +83,7 @@ class ContactosFragment : Fragment(), OnContactoClickListener {
 
     private fun setListRecyclerView() {
 
-        val lista = database.agendaDao().getAllContactos().sortedBy { it.nombre }.toMutableList()
+        val lista = database.agendaDao().getAllContactos().sortedBy { it.nombre.lowercase() }.toMutableList()
 
         mListAdapter = ItemListContactoAdapter(lista, this)
         mListLayoutManager = LinearLayoutManager(requireContext())
@@ -99,7 +97,7 @@ class ContactosFragment : Fragment(), OnContactoClickListener {
 
     private fun setGridRecyclerView() {
 
-        val lista = database.agendaDao().getAllContactos().sortedBy { it.nombre }.toMutableList()
+        val lista = database.agendaDao().getAllContactos().sortedBy { it.nombre.lowercase() }.toMutableList()
 
         mGridAdapter = ItemGridContactoAdapter(lista, this)
         mGridLayoutManager = StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL)
@@ -108,7 +106,6 @@ class ContactosFragment : Fragment(), OnContactoClickListener {
             layoutManager = mGridLayoutManager
             adapter = mGridAdapter
         }
-
     }
 
     private fun mostrarMenu(view: View) {
@@ -119,35 +116,10 @@ class ContactosFragment : Fragment(), OnContactoClickListener {
         popupMenu.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.agregar_contacto -> {
-                    val dialogo = ContactoDialog()
-                    dialogo.showAlertDialog(
-                        requireContext(),
-                        object : ContactoDialog.ContactoDialogListener {
-                            override fun onPositiveButtonClick(
-                                text1: String,
-                                text2: String,
-                                text3: String,
-                                image: String,
-                                switch: Boolean
-                            ) {
-                                val contacto = Contacto(nombre = text1, numero = text2, correo = text3, imagen = image, favorito = switch)
 
-                                database.agendaDao().addContacto(contacto)
-                                mListAdapter.setContactos(database.agendaDao().getAllContactos())
-                                mGridAdapter.setContactos(database.agendaDao().getAllContactos())
-                            }
-
-                            override fun onNegativeButtonClick() {
-
-                            }
-
-                        },
-                        "",
-                        "",
-                        "",
-                        "",
-                        false
-                    )
+                    val dialogFragment = ContactoDialogFragment()
+                    dialogFragment.setDialogListener(this)
+                    dialogFragment.show(parentFragmentManager, "nuevoContactoDialogFragment")
 
                     true
                 }
@@ -174,66 +146,80 @@ class ContactosFragment : Fragment(), OnContactoClickListener {
 
     override fun onLongClick(contacto: Contacto) {
 
-        val builder1 = AlertDialog.Builder(requireContext())
+        val builder = AlertDialog.Builder(requireContext())
             .setItems(
                 arrayOf("Editar", "Eliminar")
             ) { dialog, which ->
                 if (which == 0) {
-                    val dialogo = ContactoDialog()
-                    dialogo.showAlertDialog(
-                        requireContext(),
-                        object : ContactoDialog.ContactoDialogListener {
-                            override fun onPositiveButtonClick(
-                                text1: String,
-                                text2: String,
-                                text3: String,
-                                image: String,
-                                switch: Boolean
-                            ) {
-                                contacto.nombre = text1
-                                contacto.numero = text2
-                                contacto.correo = text3
-                                contacto.imagen = image
-                                contacto.favorito = switch
 
-                                database.agendaDao().updateContacto(contacto)
-                                mListAdapter.setContactos(database.agendaDao().getAllContactos())
-                                mGridAdapter.setContactos(database.agendaDao().getAllContactos())
-                            }
-
-                            override fun onNegativeButtonClick() {
-
-                            }
-
-                        },
-                        contacto.nombre,
-                        contacto.numero,
-                        contacto.correo,
-                        contacto.imagen,
-                        contacto.favorito
-                    )
+                    val dialogFragment = ContactoDialogFragment()
+                    dialogFragment.setDialogListener(this)
+                    val bundle = Bundle()
+                    bundle.putString("nombreContacto", contacto.nombre)
+                    bundle.putString("numeroContacto", contacto.numero)
+                    bundle.putString("correoContacto", contacto.correo)
+                    bundle.putString("imagenContacto", contacto.imagen)
+                    bundle.putBoolean("favoritoContacto", contacto.favorito)
+                    dialogFragment.arguments = bundle
+                    dialogFragment.show(parentFragmentManager, "editarContactoDialogFragment")
 
                 } else {
-                    val builder2 = AlertDialog.Builder(requireContext())
 
-                    builder2.setTitle("Alerta")
-                        .setMessage("¿Estás seguro de que deseas borrar el contacto ${contacto.nombre}?")
+                    if (database.agendaDao().getAllEventos().find { it.contactoId == contacto.id } == null) {
 
-                    builder2.setPositiveButton("Sí") { _, _ ->
-                        database.agendaDao().deleteContacto(contacto)
-                        mListAdapter.delete(contacto)
-                        mGridAdapter.delete(contacto)
+                        val builder = AlertDialog.Builder(requireContext())
+
+                        builder.setTitle("Alerta")
+                            .setMessage("¿Estás seguro de que deseas borrar el contacto ${contacto.nombre}?")
+
+                        builder.setPositiveButton("Sí") { _, _ ->
+                            database.agendaDao().deleteContacto(contacto)
+                            mListAdapter.delete(contacto)
+                            mGridAdapter.delete(contacto)
+                        }
+
+                        builder.setNegativeButton("No") { _, _ ->
+
+                        }
+
+                        builder.create().show()
+
+                    } else {
+
+                        val builder = AlertDialog.Builder(requireContext())
+
+                        builder.setTitle("Alerta")
+                            .setMessage("El contacto ${contacto.nombre} tiene eventos vinculados. ¿Desea borrar el contacto y todos sus eventos?")
+
+                        builder.setPositiveButton("Sí") { _, _ ->
+                            database.agendaDao().getAllEventos().filter { it.contactoId == contacto.id }.forEach { evento -> database.agendaDao().deleteEvento(evento) }
+                            database.agendaDao().deleteContacto(contacto)
+                            mListAdapter.delete(contacto)
+                            mGridAdapter.delete(contacto)
+                        }
+
+                        builder.setNegativeButton("No") { _, _ ->
+
+                        }
+
+                        builder.create().show()
                     }
 
-                    builder2.setNegativeButton("No") { _, _ ->
-
-                    }
-
-                    builder2.create().show()
                 }
             }
-        builder1.create().show()
+        builder.create().show()
 
+    }
+
+    override fun onDialogOpened() {
+
+    }
+
+    override fun onDialogDismissed() {
+
+        if (vistaActual == "Lista") {
+            setListRecyclerView()
+        } else setGridRecyclerView()
     }
 
 

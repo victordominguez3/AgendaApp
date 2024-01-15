@@ -3,4 +3,13 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="blue">#317871</color>
+    <color name="Azul">#BEE3DF</color>
+    <color name="Rojo">#FFA6A6</color>
+    <color name="Amarillo">#FAFFA6</color>
+    <color name="Verde">#A6FFAB</color>
+    <color name="Morado">#C8A6FF</color>
+    <color name="Naranja">#FFD1A6</color>
+    <color name="Rosa">#FFA6FA</color>
+    <color name="Gris">#B0B0B0</color>
+    <color name="GrisOscuro">#616161</color>
 </resources>

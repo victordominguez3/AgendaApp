@@ -45,14 +45,23 @@ class ItemEventoAdapter(private var listItem: MutableList<Evento>, private var l
 
     inner class ViewHolder (view: View): RecyclerView.ViewHolder(view) {
 
-        val binding = ItemEventoLayoutBinding.bind(view)
+        private val binding = ItemEventoLayoutBinding.bind(view)
 
         fun bind(item: Evento) {
 
             binding.titulo.text = item.titulo
             binding.fecha.text = item.fecha
             binding.descripcion.text = item.descripcion
-            binding.tarjeta.setBackgroundColor(Color.parseColor(item.color))
+            binding.contacto.text = database.agendaDao().getAllContactos().find { it.id == item.contactoId }?.nombre
+            binding.tarjeta.setCardBackgroundColor(ContextCompat.getColor(binding.root.context, when(item.color) {
+                "Azul" -> R.color.Azul
+                "Rojo" -> R.color.Rojo
+                "Amarillo" -> R.color.Amarillo
+                "Verde" -> R.color.Verde
+                "Morado" -> R.color.Morado
+                "Naranja" -> R.color.Naranja
+                else -> R.color.Rosa
+            }))
 
         }
 

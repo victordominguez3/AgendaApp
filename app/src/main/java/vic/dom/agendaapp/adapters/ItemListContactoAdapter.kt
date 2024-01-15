@@ -42,12 +42,18 @@ class ItemListContactoAdapter(private var listItem: MutableList<Contacto>, priva
 
     inner class ViewHolder (view: View): RecyclerView.ViewHolder(view) {
 
-        val binding = ItemContactoLayoutBinding.bind(view)
+        private val binding = ItemContactoLayoutBinding.bind(view)
 
         fun bind(item: Contacto) {
 
-            binding.numero.text = item.numero
+            binding.numero.text = "| ${item.numero}"
             binding.nombre.text = item.nombre
+
+            if (item.favorito) {
+                binding.fav.setBackgroundResource(R.drawable.favorito_true)
+            } else {
+                binding.fav.setBackgroundResource(R.drawable.favorito_false)
+            }
 
             binding.fav.setOnClickListener {
                 if (binding.fav.background.constantState == ContextCompat.getDrawable(itemView.context, R.drawable.favorito_false)?.constantState) {

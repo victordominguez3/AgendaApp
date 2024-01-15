@@ -1,5 +1,6 @@
 package vic.dom.agendaapp.adapters
 
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -57,7 +58,7 @@ class ItemGridContactoAdapter(private var listItem: MutableList<Contacto>, priva
             if (item.imagen.isNotEmpty()) {
                 try {
                     Glide.with(binding.imagen)
-                        .load(item.imagen)
+                        .load(Uri.parse(item.imagen))
                         .transform(CenterCrop(), RoundedCorners(10))
                         .transition(DrawableTransitionOptions.withCrossFade())
                         .into(binding.imagen)
@@ -75,6 +76,12 @@ class ItemGridContactoAdapter(private var listItem: MutableList<Contacto>, priva
                     .transform(CenterCrop(), RoundedCorners(10))
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(binding.imagen)
+            }
+
+            if (item.favorito) {
+                binding.fav.setBackgroundResource(R.drawable.favorito_true)
+            } else {
+                binding.fav.setBackgroundResource(R.drawable.favorito_false)
             }
 
             binding.fav.setOnClickListener {

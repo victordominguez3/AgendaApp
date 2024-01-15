@@ -11,17 +11,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import vic.dom.agendaapp.R
 import vic.dom.agendaapp.adapters.ItemEventoAdapter
 import vic.dom.agendaapp.adapters.OnEventoClickListener
-import vic.dom.agendaapp.database.AgendaApplication
 import vic.dom.agendaapp.database.AgendaApplication.Companion.database
 import vic.dom.agendaapp.databinding.FragmentEventosBinding
-import vic.dom.agendaapp.dialogs.ContactoDialog
-import vic.dom.agendaapp.dialogs.EventoDialog
-import vic.dom.agendaapp.models.Contacto
 import vic.dom.agendaapp.models.Evento
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class EventosFragment : Fragment(), OnEventoClickListener {
+class EventosFragment : Fragment(), OnEventoClickListener, EventoDialogFragment.DialogListener {
 
     private lateinit var binding: FragmentEventosBinding
 
@@ -48,7 +44,7 @@ class EventosFragment : Fragment(), OnEventoClickListener {
 
     private fun setRecyclerView() {
 
-        val lista = AgendaApplication.database.agendaDao().getAllEventos()
+        val lista = database.agendaDao().getAllEventos()
 
         mAdapter = ItemEventoAdapter(lista, this)
         mLayoutManager = LinearLayoutManager(requireContext())
@@ -69,32 +65,9 @@ class EventosFragment : Fragment(), OnEventoClickListener {
             when (menuItem.itemId) {
                 R.id.agregar_evento -> {
 
-                    EventoDialog.showAlertDialog(
-                        requireContext(),
-                        object : EventoDialog.EventoDialogListener {
-                            override fun onPositiveButtonClick(
-                                text1: String,
-                                text2: String,
-                                text3: String,
-                                fecha: String,
-                                color: String
-                            ) {
-                                val evento = Evento(contactoId = database.agendaDao().getAllContactos().find { it.nombre == text1 }?.id!!, titulo = text2, descripcion = text3, fecha = fecha, color = color)
-
-                                database.agendaDao().addEvento(evento)
-                                mAdapter.setEventos(database.agendaDao().getAllEventos())
-                            }
-
-                            override fun onNegativeButtonClick() {
-
-                            }
-                        },
-                        "",
-                        "",
-                        "",
-                        "",
-                        ""
-                    )
+                    val dialogFragment = EventoDialogFragment()
+                    dialogFragment.setDialogListener(this)
+                    dialogFragment.show(parentFragmentManager, "nuevoEventoDialogFragment")
 
                     true
                 }
@@ -108,7 +81,7 @@ class EventosFragment : Fragment(), OnEventoClickListener {
                 }
                 R.id.ordenar_titulo -> {
 
-                    mAdapter.setEventos(database.agendaDao().getAllEventos().sortedBy { it.titulo }.toMutableList())
+                    mAdapter.setEventos(database.agendaDao().getAllEventos().sortedBy { it.titulo.lowercase() }.toMutableList())
 
                     true
                 }
@@ -123,63 +96,52 @@ class EventosFragment : Fragment(), OnEventoClickListener {
 
     override fun onLongClick(evento: Evento) {
 
-        val builder1 = AlertDialog.Builder(requireContext())
+        val builder = AlertDialog.Builder(requireContext())
             .setItems(
                 arrayOf("Editar", "Eliminar")
             ) { dialog, which ->
                 if (which == 0) {
 
-                    EventoDialog.showAlertDialog(
-                        requireContext(),
-                        object : EventoDialog.EventoDialogListener {
-                            override fun onPositiveButtonClick(
-                                text1: String,
-                                text2: String,
-                                text3: String,
-                                fecha: String,
-                                color: String
-                            ) {
-                                evento.contactoId = database.agendaDao().getAllContactos().find { it.nombre == text1 }?.id!!
-                                evento.titulo = text2
-                                evento.descripcion = text3
-                                evento.fecha = fecha
-                                evento.color = color
-
-                                database.agendaDao().updateEvento(evento)
-                                mAdapter.setEventos(database.agendaDao().getAllEventos())
-                            }
-
-                            override fun onNegativeButtonClick() {
-
-                            }
-                        },
-                        database.agendaDao().getAllContactos().find { it.id == evento.contactoId }?.nombre!!,
-                        evento.titulo,
-                        evento.descripcion,
-                        evento.fecha,
-                        evento.color
-                    )
+                    val dialogFragment = EventoDialogFragment()
+                    dialogFragment.setDialogListener(this)
+                    val bundle = Bundle()
+                    bundle.putString("tituloEvento", evento.titulo)
+                    bundle.putString("fechaEvento", evento.fecha)
+                    bundle.putString("descripcionEvento", evento.descripcion)
+                    bundle.putString("colorEvento", evento.color)
+                    bundle.putLong("contactoEvento", evento.contactoId)
+                    dialogFragment.arguments = bundle
+                    dialogFragment.show(parentFragmentManager, "editarEventoDialogFragment")
 
                 } else {
-                    val builder2 = AlertDialog.Builder(requireContext())
 
-                    builder2.setTitle("Alerta")
+                    val builder = AlertDialog.Builder(requireContext())
+
+                    builder.setTitle("Alerta")
                         .setMessage("¿Estás seguro de que deseas borrar el evento ${evento.titulo}?")
 
-                    builder2.setPositiveButton("Sí") { _, _ ->
+                    builder.setPositiveButton("Sí") { _, _ ->
                         database.agendaDao().deleteEvento(evento)
                         mAdapter.delete(evento)
                     }
 
-                    builder2.setNegativeButton("No") { _, _ ->
+                    builder.setNegativeButton("No") { _, _ ->
 
                     }
 
-                    builder2.create().show()
+                    builder.create().show()
                 }
             }
-        builder1.create().show()
+        builder.create().show()
 
+    }
+
+    override fun onDialogOpened() {
+
+    }
+
+    override fun onDialogDismissed() {
+        setRecyclerView()
     }
 
 }

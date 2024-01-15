@@ -25,7 +25,7 @@
             app:layout_constraintBottom_toBottomOf="parent"/>
 
         <ImageView
-            android:id="@+id/vista"
+            android:id="@+id/opciones"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@drawable/navegacion"
@@ -46,7 +46,7 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="3dp"
             app:boxStrokeColor="#317871"
             app:hintTextColor="#317871">

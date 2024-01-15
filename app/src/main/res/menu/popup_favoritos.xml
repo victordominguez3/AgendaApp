@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/agregar_favorito"
+        android:title="Agregar contacto favorito" />
+
+    <item
+        android:id="@+id/cambiar_vista_fav"
+        android:title="Cambiar vista" />
+
+</menu>
