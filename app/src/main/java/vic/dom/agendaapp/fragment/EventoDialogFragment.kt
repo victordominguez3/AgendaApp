@@ -86,7 +86,7 @@ class EventoDialogFragment : DialogFragment() {
 
                 if (tag == "editarEventoDialogFragment") {
 
-                    val evento = database.agendaDao().getAllEventos().find { it.contactoId == arguments?.getLong("contactoEvento") }?.copy(
+                    val evento = database.agendaDao().getAllEventos().find { it.id == arguments?.getLong("idEvento") }?.copy(
                         titulo = binding.tituloEventoDialogo.text.toString(),
                         fecha = "${binding.fechaDialogo.dayOfMonth}/${binding.fechaDialogo.month + 1}/${binding.fechaDialogo.year}",
                         descripcion = binding.descripcionDialogo.text.toString(),

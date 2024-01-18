@@ -48,7 +48,7 @@
                 android:id="@+id/titulo_evento_dialogo"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:hint="Titulo *"
+                android:hint="Título *"
                 android:inputType="text"
                 android:textColor="@color/blue"
                 android:textColorHint="@color/blue"/>

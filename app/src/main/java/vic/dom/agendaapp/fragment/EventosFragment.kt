@@ -6,6 +6,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.LinearLayoutManager
 import vic.dom.agendaapp.R
@@ -29,6 +31,29 @@ class EventosFragment : Fragment(), OnEventoClickListener, EventoDialogFragment.
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentEventosBinding.inflate(inflater, container, false)
+
+        val opciones = listOf("Todos") + database.agendaDao().getAllContactos().sortedBy { it.nombre.lowercase() }.map { it.nombre }
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, opciones)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerEventos.adapter = adapter
+
+        binding.spinnerEventos.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                if (p2 == 0) {
+                    mAdapter.setEventos(database.agendaDao().getAllEventos())
+                } else {
+                    val contacto = database.agendaDao().getAllContactos().sortedBy { it.nombre.lowercase() }[p2 - 1]
+                    mAdapter.setEventos(database.agendaDao().getAllEventos().filter { it.contactoId == contacto.id }.toMutableList())
+                }
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+
+            }
+
+        }
+
         return binding.root
     }
 
@@ -105,6 +130,7 @@ class EventosFragment : Fragment(), OnEventoClickListener, EventoDialogFragment.
                     val dialogFragment = EventoDialogFragment()
                     dialogFragment.setDialogListener(this)
                     val bundle = Bundle()
+                    bundle.putLong("idEvento", evento.id)
                     bundle.putString("tituloEvento", evento.titulo)
                     bundle.putString("fechaEvento", evento.fecha)
                     bundle.putString("descripcionEvento", evento.descripcion)

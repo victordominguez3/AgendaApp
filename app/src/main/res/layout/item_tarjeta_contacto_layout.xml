@@ -4,12 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginTop="5dp">
+    android:paddingTop="2dp"
+    android:paddingBottom="2dp">
 
     <androidx.cardview.widget.CardView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="#BEE3DF"
+        app:cardBackgroundColor="#A2DDD7"
         app:cardCornerRadius="5dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/guideline"
@@ -28,7 +29,9 @@
                 android:layout_width="180dp"
                 android:layout_height="180dp"
                 android:layout_marginTop="6dp"
-                android:layout_gravity="center"/>
+                android:layout_gravity="center"
+                android:src="@drawable/fotonula"
+                android:scaleType="fitXY"/>
 
             <TextView
                 android:id="@+id/nombre"
